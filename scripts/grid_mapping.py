@@ -140,8 +140,8 @@ class GridMappingROS:
         self.map_msg.info.origin.position.x = self.map_center_x
         self.map_msg.info.origin.position.y = self.map_center_y
 
-        self.laser_sub = rospy.Subscriber("scan", LaserScan, self.laserscan_callback, queue_size=2)
-        self.map_pub = rospy.Publisher('map', OccupancyGrid, queue_size=2)
+        self.laser_sub = rospy.Subscriber("/front/scan", LaserScan, self.laserscan_callback, queue_size=2)
+        self.map_pub = rospy.Publisher('grid_map', OccupancyGrid, queue_size=2)
         self.tf_sub = tf.TransformListener()
 
     def init_gridmapping(self, laser_min_angle, laser_max_angle, laser_resolution, laser_max_dist):
