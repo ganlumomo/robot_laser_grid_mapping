@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!-- <param name="use_sim_time" value="false"/> -->
+
+    <!-- 3D Point cloud to 2D laser scan -->
+    <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="velodyne_to_laserscan" output="screen">
+
+      <remap from="cloud_in" to="/velodyne_points"/>
+      <remap from="scan" to="/front/scan"/>
+      <!-- Match the Velodyne VLP-16 parameters -->
+      <rosparam>
+          #target_frame: # Leave empty to output scan in the pointcloud frame
+          tolerance: 1.0
+          min_height: 0.05
+          max_height: 10.0
+
+          angle_increment: 0.005 # M_PI/360.0
+          scan_time: 0.1
+          range_min: 0.105
+          range_max: 100.0
+          use_inf: true
+
+          # Concurrency level, affects number of pointclouds queued for processing and number of threads used
+          # 0 : Detect number of cores
+          # 1 : Single threaded
+          # 2->inf : Parallelism level
+          concurrency_level: 1
+      </rosparam>
+    </node>
+    
+    <node pkg="tf" type="static_transform_publisher" name="velodyne_to_flipper" args="0 0 0 0 0 0 1 /flipper /velodyne 100" />
+  
+    <node name="robot_laser_grid_mapping" pkg="robot_laser_grid_mapping" type="grid_mapping.py" output="screen">
+        <param name="sensor_model_p_occ"        value="0.75"/>
+        <param name="sensor_model_p_free"       value="0.45"/> 
+        <param name="sensor_model_p_prior"      value="0.5"/> 
+        <param name="robot_frame"               value="flipper"/> 
+        <param name="map_frame"                 value="world"/> 
+        <param name="map_center_x"              value="-15.0"/> 
+        <param name="map_center_y"              value="-15.0"/> 
+        <param name="map_size_x"                value="30.0"/> 
+        <param name="map_size_y"                value="30.0"/> 
+        <param name="map_resolution"            value="0.1"/> 
+        <param name="map_publish_freq"          value="1.0"/> 
+        <param name="update_movement"           value="0.1"/> <!-- update when moved this much -->
+    </node>
+
+</launch>
